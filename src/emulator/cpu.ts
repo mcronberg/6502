@@ -63,13 +63,25 @@ export function stepCpu(
 
   switch (entry.mnemonic) {
     case 'LDA': {
-      const v = memory[pc + 1];
-      operandStr = `#${toHexByte(v)}`;
-      newCpu.A = v;
-      newCpu.flags = updateZeroNegativeFlags(v, newCpu.flags);
-      instrStr = `LDA ${operandStr}`;
-      notes = `A = ${toHexByte(v)}`;
-      newCpu.PC = pc + 2;
+      if (entry.mode === 'zeropage') {
+        const zpAddr = memory[pc + 1];
+        const v = memory[zpAddr];
+        const zpStr = `$${zpAddr.toString(16).padStart(2, '0').toUpperCase()}`;
+        operandStr = zpStr;
+        newCpu.A = v;
+        newCpu.flags = updateZeroNegativeFlags(v, newCpu.flags);
+        instrStr = `LDA ${zpStr}`;
+        notes = `A = mem[${zpStr}] = ${toHexByte(v)}`;
+        newCpu.PC = pc + 2;
+      } else {
+        const v = memory[pc + 1];
+        operandStr = `#${toHexByte(v)}`;
+        newCpu.A = v;
+        newCpu.flags = updateZeroNegativeFlags(v, newCpu.flags);
+        instrStr = `LDA ${operandStr}`;
+        notes = `A = ${toHexByte(v)}`;
+        newCpu.PC = pc + 2;
+      }
       break;
     }
     case 'LDX': {
@@ -93,16 +105,29 @@ export function stepCpu(
       break;
     }
     case 'STA': {
-      const lo = memory[pc + 1]; const hi = memory[pc + 2];
-      const addr = lo | (hi << 8);
-      operandStr = toHexWord(addr);
-      const nextMem = new Uint8Array(newMemory);
-      nextMem[addr] = newCpu.A;
-      newMemory = nextMem;
-      lastWrittenAddress = addr;
-      instrStr = `STA ${operandStr}`;
-      notes = `Wrote ${toHexByte(newCpu.A)} → ${operandStr}`;
-      newCpu.PC = pc + 3;
+      if (entry.mode === 'zeropage') {
+        const zpAddr = memory[pc + 1];
+        const zpStr = `$${zpAddr.toString(16).padStart(2, '0').toUpperCase()}`;
+        operandStr = zpStr;
+        const nextMem = new Uint8Array(newMemory);
+        nextMem[zpAddr] = newCpu.A;
+        newMemory = nextMem;
+        lastWrittenAddress = zpAddr;
+        instrStr = `STA ${zpStr}`;
+        notes = `Wrote ${toHexByte(newCpu.A)} → mem[${zpStr}]`;
+        newCpu.PC = pc + 2;
+      } else {
+        const lo = memory[pc + 1]; const hi = memory[pc + 2];
+        const addr = lo | (hi << 8);
+        operandStr = toHexWord(addr);
+        const nextMem = new Uint8Array(newMemory);
+        nextMem[addr] = newCpu.A;
+        newMemory = nextMem;
+        lastWrittenAddress = addr;
+        instrStr = `STA ${operandStr}`;
+        notes = `Wrote ${toHexByte(newCpu.A)} → ${operandStr}`;
+        newCpu.PC = pc + 3;
+      }
       break;
     }
     case 'STX': {
@@ -224,6 +249,90 @@ export function stepCpu(
       newCpu.stopped = true;
       instrStr = 'BRK'; notes = 'Program stopped (BRK)';
       newCpu.PC = pc + 1; break;
+    }
+    case 'TAX': {
+      newCpu.X = newCpu.A;
+      newCpu.flags = updateZeroNegativeFlags(newCpu.X, newCpu.flags);
+      instrStr = 'TAX'; notes = `X = A = ${toHexByte(newCpu.X)}`;
+      newCpu.PC = pc + 1; break;
+    }
+    case 'TAY': {
+      newCpu.Y = newCpu.A;
+      newCpu.flags = updateZeroNegativeFlags(newCpu.Y, newCpu.flags);
+      instrStr = 'TAY'; notes = `Y = A = ${toHexByte(newCpu.Y)}`;
+      newCpu.PC = pc + 1; break;
+    }
+    case 'TXA': {
+      newCpu.A = newCpu.X;
+      newCpu.flags = updateZeroNegativeFlags(newCpu.A, newCpu.flags);
+      instrStr = 'TXA'; notes = `A = X = ${toHexByte(newCpu.A)}`;
+      newCpu.PC = pc + 1; break;
+    }
+    case 'TYA': {
+      newCpu.A = newCpu.Y;
+      newCpu.flags = updateZeroNegativeFlags(newCpu.A, newCpu.flags);
+      instrStr = 'TYA'; notes = `A = Y = ${toHexByte(newCpu.A)}`;
+      newCpu.PC = pc + 1; break;
+    }
+    case 'CLC': {
+      newCpu.flags = { ...newCpu.flags, C: false };
+      instrStr = 'CLC'; notes = 'C = 0';
+      newCpu.PC = pc + 1; break;
+    }
+    case 'SEC': {
+      newCpu.flags = { ...newCpu.flags, C: true };
+      instrStr = 'SEC'; notes = 'C = 1';
+      newCpu.PC = pc + 1; break;
+    }
+    case 'ADC': {
+      const v = memory[pc + 1];
+      operandStr = `#${toHexByte(v)}`;
+      const carry = newCpu.flags.C ? 1 : 0;
+      const sum = newCpu.A + v + carry;
+      const overflow = (~(newCpu.A ^ v) & (newCpu.A ^ sum)) & 0x80;
+      newCpu.flags.C = sum > 0xff;
+      newCpu.flags.V = overflow !== 0;
+      newCpu.A = sum & 0xff;
+      newCpu.flags = updateZeroNegativeFlags(newCpu.A, newCpu.flags);
+      instrStr = `ADC ${operandStr}`;
+      notes = `A = ${toHexByte(newCpu.A)}`;
+      newCpu.PC = pc + 2; break;
+    }
+    case 'SBC': {
+      const v = memory[pc + 1];
+      operandStr = `#${toHexByte(v)}`;
+      const borrow = newCpu.flags.C ? 0 : 1;
+      const diff = newCpu.A - v - borrow;
+      const overflow = ((newCpu.A ^ v) & (newCpu.A ^ diff)) & 0x80;
+      newCpu.flags.C = diff >= 0;
+      newCpu.flags.V = overflow !== 0;
+      newCpu.A = diff & 0xff;
+      newCpu.flags = updateZeroNegativeFlags(newCpu.A, newCpu.flags);
+      instrStr = `SBC ${operandStr}`;
+      notes = `A = ${toHexByte(newCpu.A)}`;
+      newCpu.PC = pc + 2; break;
+    }
+    case 'BCC': {
+      const rel = memory[pc + 1];
+      const signed = toSigned8(rel);
+      const target = pc + 2 + signed;
+      operandStr = toHexWord(target);
+      const taken = !newCpu.flags.C;
+      instrStr = `BCC ${operandStr}`;
+      notes = taken ? `Branch taken to ${toHexWord(target)}` : 'Branch not taken (C=1)';
+      newCpu.PC = taken ? target : pc + 2;
+      operandValue = signed; break;
+    }
+    case 'BCS': {
+      const rel = memory[pc + 1];
+      const signed = toSigned8(rel);
+      const target = pc + 2 + signed;
+      operandStr = toHexWord(target);
+      const taken = newCpu.flags.C;
+      instrStr = `BCS ${operandStr}`;
+      notes = taken ? `Branch taken to ${toHexWord(target)}` : 'Branch not taken (C=0)';
+      newCpu.PC = taken ? target : pc + 2;
+      operandValue = signed; break;
     }
     default:
       newCpu.stopped = true;

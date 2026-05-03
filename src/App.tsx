@@ -3,6 +3,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import type { CpuState, CpuFlags, TraceEntry, RunStatus, AssemblyResult } from './emulator/types';
 import { EXAMPLE_PROGRAMS } from './emulator/examples';
 import { assemble } from './emulator/assembler';
+import { compileC } from './emulator/compiler';
 import { initialCpuState, loadProgram, stepCpu, CODE_START } from './emulator/cpu';
 
 import Header from './components/Header';
@@ -24,6 +25,8 @@ function freshMemory(): Uint8Array {
 export default function App() {
     const [selectedExampleId, setSelectedExampleId] = useState(EXAMPLE_PROGRAMS[0].id);
     const [source, setSource] = useState('');
+    const [editorMode, setEditorMode] = useState<'asm' | 'c'>('asm');
+    const [generatedAsm, setGeneratedAsm] = useState('');
 
     const [assembled, setAssembled] = useState<AssemblyResult | null>(null);
     const [assembleErrors, setAssembleErrors] = useState<string[]>([]);
@@ -84,11 +87,28 @@ export default function App() {
         setSelectedExampleId(id);
     };
 
+    const handleSetMode = useCallback((mode: 'asm' | 'c') => {
+        if (mode === editorMode) return;
+        stopRunLoop();
+        setEditorMode(mode);
+        setGeneratedAsm('');
+        setAssembled(null);
+        assembledRef.current = null;
+        setAssembleErrors([]);
+        setRunStatus('stopped');
+        const firstExample = EXAMPLE_PROGRAMS.find((p) =>
+            mode === 'c' ? p.language === 'c' : p.language !== 'c'
+        );
+        if (firstExample) setSelectedExampleId(firstExample.id);
+    }, [editorMode, stopRunLoop]);
+
     const handleLoad = useCallback(() => {
         const prog = EXAMPLE_PROGRAMS.find((p) => p.id === selectedExampleId);
         if (!prog) return;
         stopRunLoop();
         setSource(prog.source);
+        setEditorMode(prog.language === 'c' ? 'c' : 'asm');
+        setGeneratedAsm('');
         setAssembleErrors([]);
         setAssembled(null);
         assembledRef.current = null;
@@ -108,6 +128,7 @@ export default function App() {
     const handleClear = useCallback(() => {
         stopRunLoop();
         setSource('');
+        setGeneratedAsm('');
         setAssembleErrors([]);
         setAssembled(null);
         assembledRef.current = null;
@@ -126,7 +147,23 @@ export default function App() {
 
     const handleAssemble = useCallback(() => {
         stopRunLoop();
-        const result = assemble(source);
+
+        let asmSource = source;
+        if (editorMode === 'c') {
+            const compiled = compileC(source);
+            if (compiled.errors.length > 0) {
+                setAssembleErrors(compiled.errors);
+                setGeneratedAsm('');
+                setRunStatus('error');
+                return;
+            }
+            asmSource = compiled.asm;
+            setGeneratedAsm(compiled.asm);
+        } else {
+            setGeneratedAsm('');
+        }
+
+        const result = assemble(asmSource);
         setAssembleErrors(result.errors);
         if (result.errors.length > 0) {
             setRunStatus('error');
@@ -144,7 +181,7 @@ export default function App() {
         stepCounterRef.current = 1;
         setLastWrittenAddress(undefined);
         setRunStatus('stopped');
-    }, [source, stopRunLoop]);
+    }, [source, editorMode, stopRunLoop]);
 
     const handleStep = useCallback(() => {
         if (!assembledRef.current) return;
@@ -195,7 +232,7 @@ export default function App() {
 
     useEffect(() => () => stopRunLoop(), [stopRunLoop]);
 
-    const currentSourceLine = assembled
+    const currentSourceLine = (assembled && editorMode === 'asm')
         ? (assembled.addressToSourceLine[cpu.PC] ?? null)
         : null;
 
@@ -213,6 +250,7 @@ export default function App() {
                 onClear={handleClear}
                 runStatus={runStatus}
                 isAssembled={assembled !== null && assembleErrors.length === 0}
+                editorMode={editorMode}
             />
 
             <div className="flex flex-1 min-h-0">
@@ -225,6 +263,9 @@ export default function App() {
                             programSize={assembled?.programSize ?? 0}
                             entryPoint={CODE_START}
                             errors={assembleErrors}
+                            editorMode={editorMode}
+                            onSetMode={handleSetMode}
+                            generatedAsm={generatedAsm}
                         />
                     </div>
                     <div className="flex-[2] min-h-0 flex flex-col overflow-hidden">

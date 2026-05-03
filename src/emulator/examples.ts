@@ -68,4 +68,33 @@ loop:
   STX $0200       ; Store result
   BRK             ; Stop`,
   },
+  // ── C examples ────────────────────────────────────────────────────────────
+  {
+    id: 'c-countdown',
+    title: 'Countdown (C)',
+    description: 'Count down from 5 to 0 — intro to while loops',
+    icon: 'C',
+    language: 'c',
+    source: `// Count down from 5 to 0
+byte x = 5;
+while (x != 0) {
+  x--;
+}
+mem[0x0200] = x;`,
+  },
+  {
+    id: 'c-multiply',
+    title: 'Multiply by 3 (C)',
+    description: 'Repeated addition: compute 4 × 3 and store result',
+    icon: 'C',
+    language: 'c',
+    source: `// Compute 4 × 3 via repeated addition
+byte count = 3;
+byte result = 0;
+while (count != 0) {
+  result = result + 4;
+  count--;
+}
+mem[0x0200] = result;`,
+  },
 ];

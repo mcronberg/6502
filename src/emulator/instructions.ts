@@ -6,6 +6,7 @@
 export type AddressingMode =
   | 'immediate'   // #$nn
   | 'absolute'    // $hhhh
+  | 'zeropage'    // $nn  (address 0x00–0xFF)
   | 'implied'     // no operand
   | 'relative';   // branch offset
 
@@ -36,6 +37,23 @@ export const OPCODE_TABLE: Record<string, OpcodeEntry> = {
   'BEQ relative':  { opcode: 0xf0, size: 2, mode: 'relative',  mnemonic: 'BEQ' },
   'NOP implied':   { opcode: 0xea, size: 1, mode: 'implied',   mnemonic: 'NOP' },
   'BRK implied':   { opcode: 0x00, size: 1, mode: 'implied',   mnemonic: 'BRK' },
+  // Register transfers
+  'TAX implied':   { opcode: 0xaa, size: 1, mode: 'implied',   mnemonic: 'TAX' },
+  'TAY implied':   { opcode: 0xa8, size: 1, mode: 'implied',   mnemonic: 'TAY' },
+  'TXA implied':   { opcode: 0x8a, size: 1, mode: 'implied',   mnemonic: 'TXA' },
+  'TYA implied':   { opcode: 0x98, size: 1, mode: 'implied',   mnemonic: 'TYA' },
+  // Carry flag
+  'CLC implied':   { opcode: 0x18, size: 1, mode: 'implied',   mnemonic: 'CLC' },
+  'SEC implied':   { opcode: 0x38, size: 1, mode: 'implied',   mnemonic: 'SEC' },
+  // Arithmetic
+  'ADC immediate': { opcode: 0x69, size: 2, mode: 'immediate', mnemonic: 'ADC' },
+  'SBC immediate': { opcode: 0xe9, size: 2, mode: 'immediate', mnemonic: 'SBC' },
+  // Zero page memory
+  'LDA zeropage':  { opcode: 0xa5, size: 2, mode: 'zeropage',  mnemonic: 'LDA' },
+  'STA zeropage':  { opcode: 0x85, size: 2, mode: 'zeropage',  mnemonic: 'STA' },
+  // Extra branches
+  'BCC relative':  { opcode: 0x90, size: 2, mode: 'relative',  mnemonic: 'BCC' },
+  'BCS relative':  { opcode: 0xb0, size: 2, mode: 'relative',  mnemonic: 'BCS' },
 };
 
 /** Decode opcode byte → entry (or undefined if unknown) */
@@ -52,10 +70,10 @@ export function buildExplanation(
   const op = operandStr ?? '';
   const val = operandValue !== undefined ? operandValue : 0;
   switch (mnemonic) {
-    case 'LDA': return `Load the value ${op} into A`;
+    case 'LDA': return op.startsWith('#') ? `Load the value ${op} into A` : `Load A from memory at ${op}`;
     case 'LDX': return `Load the value ${op} into X`;
     case 'LDY': return `Load the value ${op} into Y`;
-    case 'STA': return `Store A in memory at ${op}`;
+    case 'STA': return `Store A at memory ${op}`;
     case 'STX': return `Store X in memory at ${op}`;
     case 'STY': return `Store Y in memory at ${op}`;
     case 'INX': return 'Increase X by 1';
@@ -76,6 +94,22 @@ export function buildExplanation(
     }
     case 'NOP': return 'No operation — do nothing';
     case 'BRK': return 'Force Break / Stop program execution';
+    case 'TAX': return 'Copy A to X';
+    case 'TAY': return 'Copy A to Y';
+    case 'TXA': return 'Copy X to A';
+    case 'TYA': return 'Copy Y to A';
+    case 'CLC': return 'Clear carry flag (C = 0)';
+    case 'SEC': return 'Set carry flag (C = 1)';
+    case 'ADC': return `Add ${op} to A with carry`;
+    case 'SBC': return `Subtract ${op} from A with borrow`;
+    case 'BCC': {
+      const offset = val >= 0 ? `+${val}` : `${val}`;
+      return `If C flag = 0, add offset ${offset} to PC`;
+    }
+    case 'BCS': {
+      const offset = val >= 0 ? `+${val}` : `${val}`;
+      return `If C flag = 1, add offset ${offset} to PC`;
+    }
     default:    return `Execute ${mnemonic}`;
   }
 }

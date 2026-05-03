@@ -64,6 +64,7 @@ export type ExampleProgram = {
   description: string;
   icon: string;       // Unicode/text symbol
   source: string;
+  language?: 'asm' | 'c'; // defaults to 'asm'
   comingSoon?: boolean;
 };
 
