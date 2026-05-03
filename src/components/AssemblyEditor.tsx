@@ -5,6 +5,9 @@ type Props = {
     programSize: number;
     entryPoint: number;
     errors: string[];
+    editorMode: 'asm' | 'c';
+    onSetMode: (mode: 'asm' | 'c') => void;
+    generatedAsm: string;
 };
 
 export default function AssemblyEditor({
@@ -14,6 +17,9 @@ export default function AssemblyEditor({
     programSize,
     entryPoint,
     errors,
+    editorMode,
+    onSetMode,
+    generatedAsm,
 }: Props) {
     const lines = source.split('\n');
 
@@ -22,8 +28,26 @@ export default function AssemblyEditor({
             {/* Panel header */}
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#1e2128]">
                 <h2 className="font-mono text-xs font-bold text-gray-400 uppercase tracking-widest">
-                    &lt;/&gt; Assembly Editor
+                    {editorMode === 'asm' ? <>&lt;/&gt; Assembly Editor</> : <>&#123;&#125; C Editor</>}
                 </h2>
+                <div className="flex rounded overflow-hidden border border-[#2a2d35]">
+                    <button
+                        onClick={() => onSetMode('asm')}
+                        className={`px-2.5 py-0.5 font-mono text-[10px] font-bold transition-colors ${
+                            editorMode === 'asm'
+                                ? 'bg-green-900/60 text-green-300'
+                                : 'bg-[#1a1d24] text-gray-500 hover:text-gray-300'
+                        }`}
+                    >ASM</button>
+                    <button
+                        onClick={() => onSetMode('c')}
+                        className={`px-2.5 py-0.5 font-mono text-[10px] font-bold border-l border-[#2a2d35] transition-colors ${
+                            editorMode === 'c'
+                                ? 'bg-amber-900/60 text-amber-300'
+                                : 'bg-[#1a1d24] text-gray-500 hover:text-gray-300'
+                        }`}
+                    >C</button>
+                </div>
             </div>
 
             {/* Error banner */}
@@ -83,6 +107,20 @@ export default function AssemblyEditor({
                     style={{ lineHeight: '1.25rem', minHeight: '100%' }}
                 />
             </div>
+
+            {/* Generated ASM panel — only in C mode after compiling */}
+            {editorMode === 'c' && generatedAsm && (
+                <div className="border-t border-[#1e2128] flex flex-col max-h-48">
+                    <div className="px-3 py-1 border-b border-[#1e2128] flex items-center gap-2">
+                        <span className="font-mono text-[10px] font-bold text-amber-400 uppercase tracking-widest">
+                            ↓ Generated Assembly
+                        </span>
+                    </div>
+                    <pre className="font-mono text-xs text-gray-300 p-3 overflow-auto bg-[#0a0c10] leading-5">
+                        {generatedAsm}
+                    </pre>
+                </div>
+            )}
 
             {/* Footer */}
             <div className="flex justify-between items-center px-3 py-1.5 border-t border-[#1e2128] text-xs font-mono text-gray-500">

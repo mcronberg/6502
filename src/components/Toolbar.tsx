@@ -12,6 +12,7 @@ type Props = {
     onClear: () => void;
     runStatus: RunStatus;
     isAssembled: boolean;
+    editorMode: 'asm' | 'c';
 };
 
 const STATUS_STYLES: Record<RunStatus, string> = {
@@ -39,8 +40,12 @@ export default function Toolbar({
     onClear,
     runStatus,
     isAssembled,
+    editorMode,
 }: Props) {
     const isRunning = runStatus === 'running';
+    const examples = EXAMPLE_PROGRAMS.filter((p) =>
+        editorMode === 'c' ? p.language === 'c' : p.language !== 'c'
+    );
 
     return (
         <div className="flex flex-wrap items-center gap-2 px-4 py-2 bg-[#0d0f14] border-b border-[#1e2128]">
@@ -50,7 +55,7 @@ export default function Toolbar({
                 value={selectedExampleId}
                 onChange={(e) => onSelectExample(e.target.value)}
             >
-                {EXAMPLE_PROGRAMS.map((p) => (
+                {examples.map((p) => (
                     <option key={p.id} value={p.id}>{p.title}</option>
                 ))}
             </select>
@@ -70,7 +75,7 @@ export default function Toolbar({
                 disabled={isRunning}
                 className="toolbar-btn bg-[#1a1d24] border-[#3a3d45] text-gray-200 hover:border-green-600 hover:text-green-300"
             >
-                ⚙ Assemble
+                {editorMode === 'c' ? '⚙ Compile' : '⚙ Assemble'}
             </button>
 
             <button

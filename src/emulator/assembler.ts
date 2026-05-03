@@ -195,6 +195,15 @@ export function assemble(source: string): AssemblyResult {
       bytes.push(relByte);
       operandValue = toSigned8(relByte);
       operandStr = `${toHexByte(relByte)} (${operandValue >= 0 ? '+' : ''}${operandValue})`;
+    } else if (entry.mode === 'zeropage') {
+      if (parsed.kind !== 'absolute') {
+        errors.push(`Line ${tok.lineIndex + 1}: Expected zero-page address ($00–$FF) for ${tok.mnemonic}`);
+        continue;
+      }
+      const zpAddr = parsed.value & 0xff;
+      operandValue = zpAddr;
+      operandStr = `$${zpAddr.toString(16).padStart(2, '0').toUpperCase()}`;
+      bytes.push(zpAddr);
     }
 
     const explanation = buildExplanation(tok.mnemonic, operandStr, operandValue);
@@ -242,8 +251,12 @@ export function assemble(source: string): AssemblyResult {
 function detectMode(mnemonic: string, operand: string | undefined): string {
   if (!operand) return 'implied';
   if (/^#/.test(operand)) return 'immediate';
-  if (['BNE', 'BEQ'].includes(mnemonic)) return 'relative';
+  if (['BNE', 'BEQ', 'BCC', 'BCS'].includes(mnemonic)) return 'relative';
   if (mnemonic === 'JMP') return 'absolute';
+  // $XX (1-2 hex digits) for LDA/STA → zero page; longer addresses → absolute
+  if (/^\$[0-9A-Fa-f]{1,2}$/.test(operand) && ['LDA', 'STA'].includes(mnemonic)) {
+    return 'zeropage';
+  }
   if (/^\$[0-9A-Fa-f]{1,4}$/.test(operand) || /^[A-Za-z_]/.test(operand)) {
     return 'absolute';
   }
