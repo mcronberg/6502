@@ -19,18 +19,30 @@ export default function CpuPanel({ cpu, prevFlags }: Props) {
                 CPU
             </h2>
 
-            <div className="flex items-center justify-between gap-2">
-                <div className="flex flex-col gap-1.5">
-                    {(['A', 'X', 'Y'] as const).map((reg) => (
-                        <RegisterBox key={reg} name={reg} value={cpu[reg]} />
-                    ))}
+            <div>
+                <div className="text-[10px] font-mono text-gray-600 uppercase tracking-widest mb-1">
+                    Registers
                 </div>
-                <div className="flex flex-col items-center">
-                    <ChipVisual />
+                <div className="flex items-center justify-between gap-2">
+                    <div className="flex flex-col gap-1.5">
+                        {(['A', 'X', 'Y'] as const).map((reg) => (
+                            <RegisterBox key={reg} name={reg} value={cpu[reg]}
+                                title={reg === 'A' ? 'Accumulator — main arithmetic register' : `Index register ${reg}`} />
+                        ))}
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <ChipVisual />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <RegisterBox name="PC" value={cpu.PC} wide
+                            title="Program Counter — address of the next instruction" />
+                        <RegisterBox name="SP" value={cpu.SP} muted
+                            title="Stack Pointer — top of stack at $01xx, grows downward" />
+                    </div>
                 </div>
-                <div className="flex flex-col gap-1.5">
-                    <RegisterBox name="PC" value={cpu.PC} wide />
-                    <RegisterBox name="SP" value={cpu.SP} muted />
+                <div className="flex gap-3 mt-1 text-[9px] font-mono text-gray-600">
+                    <span className="text-green-700">■ A X Y — general purpose</span>
+                    <span className="text-gray-600">■ PC — program counter &nbsp; SP — stack pointer</span>
                 </div>
             </div>
 
@@ -81,16 +93,19 @@ function RegisterBox({
     value,
     wide,
     muted,
+    title,
 }: {
     name: string;
     value: number;
     wide?: boolean;
     muted?: boolean;
+    title?: string;
 }) {
     const formatted = wide ? toHexWord(value) : toHexByte(value);
 
     return (
         <div
+            title={title}
             className={[
                 'flex items-center gap-2 px-2 py-1 rounded border font-mono text-xs',
                 muted
