@@ -21,8 +21,28 @@ An educational single-page app that simulates the MOS 6502 processor — built w
 
 ## Supported instructions
 
-`LDA` `LDX` `LDY` `STA` `STX` `STY` `INX` `INY` `DEX` `DEY`  
-`CPX` `CPY` `CMP` `JMP` `BNE` `BEQ` `NOP` `BRK`
+| Mnemonic | Mode      | Opcode | Bytes | Description |
+|----------|-----------|--------|-------|-------------|
+| `LDA`    | immediate | `$A9`  | 2     | Load value into A |
+| `LDX`    | immediate | `$A2`  | 2     | Load value into X |
+| `LDY`    | immediate | `$A0`  | 2     | Load value into Y |
+| `STA`    | absolute  | `$8D`  | 3     | Store A at address |
+| `STX`    | absolute  | `$8E`  | 3     | Store X at address |
+| `STY`    | absolute  | `$8C`  | 3     | Store Y at address |
+| `INX`    | implied   | `$E8`  | 1     | Increment X by 1 |
+| `INY`    | implied   | `$C8`  | 1     | Increment Y by 1 |
+| `DEX`    | implied   | `$CA`  | 1     | Decrement X by 1 |
+| `DEY`    | implied   | `$88`  | 1     | Decrement Y by 1 |
+| `CPX`    | immediate | `$E0`  | 2     | Compare X with value, update flags |
+| `CPY`    | immediate | `$C0`  | 2     | Compare Y with value, update flags |
+| `CMP`    | immediate | `$C9`  | 2     | Compare A with value, update flags |
+| `JMP`    | absolute  | `$4C`  | 3     | Jump to address |
+| `BNE`    | relative  | `$D0`  | 2     | Branch if Z = 0 |
+| `BEQ`    | relative  | `$F0`  | 2     | Branch if Z = 1 |
+| `NOP`    | implied   | `$EA`  | 1     | No operation |
+| `BRK`    | implied   | `$00`  | 1     | Break / stop execution |
+
+Programs load at `$0600`. Relative branch offset = target − (PC + 2), range −128..+127.
 
 ## Running locally
 
