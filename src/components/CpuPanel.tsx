@@ -159,58 +159,58 @@ function ChipVisual({ onClick }: { onClick: () => void }) {
 }
 
 const LEFT_PINS = [
-    { n: 1,  label: 'VSS',  desc: 'Ground (0V)',                                         type: 'gnd'  },
-    { n: 2,  label: 'RDY',  desc: 'Ready — hold low to pause CPU between cycles',         type: 'ctrl' },
-    { n: 3,  label: 'φ1',   desc: 'Phase 1 clock output',                                type: 'ctrl' },
-    { n: 4,  label: '/IRQ', desc: 'Interrupt Request — maskable, active low',             type: 'ctrl' },
-    { n: 5,  label: '/ML',  desc: 'Memory Lock — active low during R/W cycles',           type: 'ctrl' },
-    { n: 6,  label: '/NMI', desc: 'Non-Maskable Interrupt — active low',                  type: 'ctrl' },
-    { n: 7,  label: 'SYNC', desc: 'High during opcode fetch cycle',                       type: 'ctrl' },
-    { n: 8,  label: 'VCC',  desc: '+5V power supply',                                    type: 'pwr'  },
-    { n: 9,  label: 'A0',   desc: 'Address bus bit 0 (LSB)',                              type: 'addr' },
-    { n: 10, label: 'A1',   desc: 'Address bus bit 1',                                   type: 'addr' },
-    { n: 11, label: 'A2',   desc: 'Address bus bit 2',                                   type: 'addr' },
-    { n: 12, label: 'A3',   desc: 'Address bus bit 3',                                   type: 'addr' },
-    { n: 13, label: 'A4',   desc: 'Address bus bit 4',                                   type: 'addr' },
-    { n: 14, label: 'A5',   desc: 'Address bus bit 5',                                   type: 'addr' },
-    { n: 15, label: 'A6',   desc: 'Address bus bit 6',                                   type: 'addr' },
-    { n: 16, label: 'A7',   desc: 'Address bus bit 7',                                   type: 'addr' },
-    { n: 17, label: 'A8',   desc: 'Address bus bit 8',                                   type: 'addr' },
-    { n: 18, label: 'A9',   desc: 'Address bus bit 9',                                   type: 'addr' },
-    { n: 19, label: 'A10',  desc: 'Address bus bit 10',                                  type: 'addr' },
-    { n: 20, label: 'A11',  desc: 'Address bus bit 11',                                  type: 'addr' },
+    { n: 1, label: 'VSS', desc: 'Ground (0V)', type: 'gnd' },
+    { n: 2, label: 'RDY', desc: 'Ready — hold low to pause CPU between cycles', type: 'ctrl' },
+    { n: 3, label: 'φ1', desc: 'Phase 1 clock output', type: 'ctrl' },
+    { n: 4, label: '/IRQ', desc: 'Interrupt Request — maskable, active low', type: 'ctrl' },
+    { n: 5, label: '/ML', desc: 'Memory Lock — active low during R/W cycles', type: 'ctrl' },
+    { n: 6, label: '/NMI', desc: 'Non-Maskable Interrupt — active low', type: 'ctrl' },
+    { n: 7, label: 'SYNC', desc: 'High during opcode fetch cycle', type: 'ctrl' },
+    { n: 8, label: 'VCC', desc: '+5V power supply', type: 'pwr' },
+    { n: 9, label: 'A0', desc: 'Address bus bit 0 (LSB)', type: 'addr' },
+    { n: 10, label: 'A1', desc: 'Address bus bit 1', type: 'addr' },
+    { n: 11, label: 'A2', desc: 'Address bus bit 2', type: 'addr' },
+    { n: 12, label: 'A3', desc: 'Address bus bit 3', type: 'addr' },
+    { n: 13, label: 'A4', desc: 'Address bus bit 4', type: 'addr' },
+    { n: 14, label: 'A5', desc: 'Address bus bit 5', type: 'addr' },
+    { n: 15, label: 'A6', desc: 'Address bus bit 6', type: 'addr' },
+    { n: 16, label: 'A7', desc: 'Address bus bit 7', type: 'addr' },
+    { n: 17, label: 'A8', desc: 'Address bus bit 8', type: 'addr' },
+    { n: 18, label: 'A9', desc: 'Address bus bit 9', type: 'addr' },
+    { n: 19, label: 'A10', desc: 'Address bus bit 10', type: 'addr' },
+    { n: 20, label: 'A11', desc: 'Address bus bit 11', type: 'addr' },
 ];
 
 const RIGHT_PINS = [
     { n: 40, label: '/RES', desc: 'Reset — pull low to reset CPU, jumps to vector $FFFC', type: 'ctrl' },
-    { n: 39, label: 'φ2',   desc: 'Phase 2 clock input (main system clock)',              type: 'ctrl' },
-    { n: 38, label: 'SO',   desc: 'Set Overflow — forces V flag high on falling edge',    type: 'ctrl' },
-    { n: 37, label: 'φ0',   desc: 'Phase 0 clock input (TTL level)',                     type: 'ctrl' },
-    { n: 36, label: 'BE',   desc: 'Bus Enable — tristates address/data/R/W when low',    type: 'ctrl' },
-    { n: 35, label: 'NC',   desc: 'Not connected',                                       type: 'ctrl' },
-    { n: 34, label: 'R/W',  desc: 'Read/Write — high = read, low = write',               type: 'ctrl' },
-    { n: 33, label: 'D0',   desc: 'Data bus bit 0 (LSB)',                                type: 'data' },
-    { n: 32, label: 'D1',   desc: 'Data bus bit 1',                                      type: 'data' },
-    { n: 31, label: 'D2',   desc: 'Data bus bit 2',                                      type: 'data' },
-    { n: 30, label: 'D3',   desc: 'Data bus bit 3',                                      type: 'data' },
-    { n: 29, label: 'D4',   desc: 'Data bus bit 4',                                      type: 'data' },
-    { n: 28, label: 'D5',   desc: 'Data bus bit 5',                                      type: 'data' },
-    { n: 27, label: 'D6',   desc: 'Data bus bit 6',                                      type: 'data' },
-    { n: 26, label: 'D7',   desc: 'Data bus bit 7 (MSB)',                                type: 'data' },
-    { n: 25, label: 'A15',  desc: 'Address bus bit 15 (MSB) — selects 32 KB bank',       type: 'addr' },
-    { n: 24, label: 'A14',  desc: 'Address bus bit 14',                                  type: 'addr' },
-    { n: 23, label: 'A13',  desc: 'Address bus bit 13',                                  type: 'addr' },
-    { n: 22, label: 'A12',  desc: 'Address bus bit 12',                                  type: 'addr' },
-    { n: 21, label: 'VSS',  desc: 'Ground (0V)',                                         type: 'gnd'  },
+    { n: 39, label: 'φ2', desc: 'Phase 2 clock input (main system clock)', type: 'ctrl' },
+    { n: 38, label: 'SO', desc: 'Set Overflow — forces V flag high on falling edge', type: 'ctrl' },
+    { n: 37, label: 'φ0', desc: 'Phase 0 clock input (TTL level)', type: 'ctrl' },
+    { n: 36, label: 'BE', desc: 'Bus Enable — tristates address/data/R/W when low', type: 'ctrl' },
+    { n: 35, label: 'NC', desc: 'Not connected', type: 'ctrl' },
+    { n: 34, label: 'R/W', desc: 'Read/Write — high = read, low = write', type: 'ctrl' },
+    { n: 33, label: 'D0', desc: 'Data bus bit 0 (LSB)', type: 'data' },
+    { n: 32, label: 'D1', desc: 'Data bus bit 1', type: 'data' },
+    { n: 31, label: 'D2', desc: 'Data bus bit 2', type: 'data' },
+    { n: 30, label: 'D3', desc: 'Data bus bit 3', type: 'data' },
+    { n: 29, label: 'D4', desc: 'Data bus bit 4', type: 'data' },
+    { n: 28, label: 'D5', desc: 'Data bus bit 5', type: 'data' },
+    { n: 27, label: 'D6', desc: 'Data bus bit 6', type: 'data' },
+    { n: 26, label: 'D7', desc: 'Data bus bit 7 (MSB)', type: 'data' },
+    { n: 25, label: 'A15', desc: 'Address bus bit 15 (MSB) — selects 32 KB bank', type: 'addr' },
+    { n: 24, label: 'A14', desc: 'Address bus bit 14', type: 'addr' },
+    { n: 23, label: 'A13', desc: 'Address bus bit 13', type: 'addr' },
+    { n: 22, label: 'A12', desc: 'Address bus bit 12', type: 'addr' },
+    { n: 21, label: 'VSS', desc: 'Ground (0V)', type: 'gnd' },
 ];
 
 function pinColors(type: string) {
     switch (type) {
-        case 'pwr':  return { row: 'bg-red-950/40',    label: 'text-red-400',    wire: 'bg-red-700'    };
-        case 'gnd':  return { row: 'bg-zinc-900/60',   label: 'text-zinc-400',   wire: 'bg-zinc-600'   };
-        case 'addr': return { row: 'bg-blue-950/40',   label: 'text-blue-300',   wire: 'bg-blue-700'   };
-        case 'data': return { row: 'bg-amber-950/40',  label: 'text-amber-300',  wire: 'bg-amber-700'  };
-        default:     return { row: '',                 label: 'text-green-400',  wire: 'bg-green-700'  };
+        case 'pwr': return { row: 'bg-red-950/40', label: 'text-red-400', wire: 'bg-red-700' };
+        case 'gnd': return { row: 'bg-zinc-900/60', label: 'text-zinc-400', wire: 'bg-zinc-600' };
+        case 'addr': return { row: 'bg-blue-950/40', label: 'text-blue-300', wire: 'bg-blue-700' };
+        case 'data': return { row: 'bg-amber-950/40', label: 'text-amber-300', wire: 'bg-amber-700' };
+        default: return { row: '', label: 'text-green-400', wire: 'bg-green-700' };
     }
 }
 
@@ -251,11 +251,11 @@ function ChipDetailOverlay({ onClose }: { onClose: () => void }) {
                         {LEFT_PINS.map(pin => {
                             const c = pinColors(pin.type);
                             return (
-                            <div key={pin.n} className={`flex items-center rounded-l px-0.5 ${c.row}`} title={pin.desc}>
-                                <span className="text-gray-600 font-mono text-[9px] w-5 text-right">{pin.n}</span>
-                                <span className={`font-mono text-[11px] font-bold w-11 text-right pr-1 ${c.label}`}>{pin.label}</span>
-                                <div className={`w-3 h-px ${c.wire}`} />
-                            </div>
+                                <div key={pin.n} className={`flex items-center rounded-l px-0.5 ${c.row}`} title={pin.desc}>
+                                    <span className="text-gray-600 font-mono text-[9px] w-5 text-right">{pin.n}</span>
+                                    <span className={`font-mono text-[11px] font-bold w-11 text-right pr-1 ${c.label}`}>{pin.label}</span>
+                                    <div className={`w-3 h-px ${c.wire}`} />
+                                </div>
                             );
                         })}
                     </div>
@@ -272,11 +272,11 @@ function ChipDetailOverlay({ onClose }: { onClose: () => void }) {
                         {RIGHT_PINS.map(pin => {
                             const c = pinColors(pin.type);
                             return (
-                            <div key={pin.n} className={`flex items-center rounded-r px-0.5 ${c.row}`} title={pin.desc}>
-                                <div className={`w-3 h-px ${c.wire}`} />
-                                <span className={`font-mono text-[11px] font-bold w-11 pl-1 ${c.label}`}>{pin.label}</span>
-                                <span className="text-gray-600 font-mono text-[9px] w-5">{pin.n}</span>
-                            </div>
+                                <div key={pin.n} className={`flex items-center rounded-r px-0.5 ${c.row}`} title={pin.desc}>
+                                    <div className={`w-3 h-px ${c.wire}`} />
+                                    <span className={`font-mono text-[11px] font-bold w-11 pl-1 ${c.label}`}>{pin.label}</span>
+                                    <span className="text-gray-600 font-mono text-[9px] w-5">{pin.n}</span>
+                                </div>
                             );
                         })}
                     </div>
