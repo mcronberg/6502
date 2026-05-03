@@ -2,7 +2,7 @@
 
 **Live demo:** https://mcronberg.github.io/6502/
 
-Skabt af Michell Cronberg i samarbejde med Claude til brug i undervisning og foredrag.
+Created by Michell Cronberg in collaboration with Claude for use in teaching and presentations.
 
 An educational single-page app that simulates the MOS 6502 processor — built with React, TypeScript, and Tailwind CSS.
 
